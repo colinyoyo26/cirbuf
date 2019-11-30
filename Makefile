@@ -8,6 +8,11 @@ main.c:
 driver: main.c tests/test-cirbuf.c tests/unit-test.c main.c
 	$(CC) $(CFLAGS) -o $@ $^
 	./$@
+bench: tests/benchmark.c
+	$(CC) $(CFLAGS) -o $@ $^ 
+plot: bench
+	bash tests/plot.sh
+
 
 clean:
 	rm -f main.c driver
