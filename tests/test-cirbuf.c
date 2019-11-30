@@ -109,3 +109,12 @@ void TestCirbuf_independant_of_each_other_with_no_polling(CuTest *tc)
     CuAssertTrue(tc, !strncmp("abcd", (char *) cirbuf_peek(&cb), 4));
     CuAssertTrue(tc, !strncmp("efgh", (char *) cirbuf_peek(&cb2), 4));
 }
+
+void TestCirbuf_cant_poll_more_than_datas(CuTest *tc)
+{
+    cirbuf_t cb;
+    cirbuf_new(&cb, 65536);
+    cirbuf_offer(&cb, (unsigned char *) "1000", 4);
+    CuAssertTrue(tc, NULL == cirbuf_poll(&cb, 5));
+}
+
