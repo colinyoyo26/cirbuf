@@ -118,3 +118,15 @@ void TestCirbuf_cant_poll_more_than_datas(CuTest *tc)
     CuAssertTrue(tc, NULL == cirbuf_poll(&cb, 5));
 }
 
+void TestCirbuf_can_offer_if_at_boundary(CuTest *tc){
+    cirbuf_t cb;
+    cirbuf_new(&cb, 65536);
+    char buf[65536];
+    buf[65535] = '\0';
+    for(int i = 0; i < 65535; i++)
+        buf[i] = 'a' + i % 26;
+    cirbuf_offer(&cb, buf, 65535);
+    cirbuf_poll(&cb, 65535);
+    cirbuf_offer(&cb, "9876", 4);
+    CuAssertTrue(tc, !strncmp("9876", (char *) cirbuf_poll(&cb, 4), 4));
+}
