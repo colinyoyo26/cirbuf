@@ -233,7 +233,7 @@ void CuSuiteRun(CuSuite *testSuite)
 }
 
 void segvhandler() {
-    CuFail_Line(testing, NULL, NULL, NULL, "segmentation fault");
+    CuFail_Line(testing, NULL, NULL, NULL, "invalid access");
 }
 
 void CuSuiteSummary(CuSuite *testSuite, CuString *summary)
