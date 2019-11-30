@@ -219,15 +219,21 @@ void CuSuiteAddSuite(CuSuite *testSuite, CuSuite *testSuite2)
     }
 }
 
+CuTest *testing;
 void CuSuiteRun(CuSuite *testSuite)
 {
     for (int i = 0; i < testSuite->count; ++i) {
         CuTest *testCase = testSuite->list[i];
+        testing = testCase;
         CuTestRun(testCase);
         if (testCase->failed) {
             testSuite->failCount += 1;
         }
     }
+}
+
+void segvhandler() {
+    CuFail_Line(testing, NULL, NULL, NULL, "segmentation fault");
 }
 
 void CuSuiteSummary(CuSuite *testSuite, CuString *summary)
