@@ -17,6 +17,8 @@ typedef struct {
 #define MAP_ANONYMOUS MAP_ANON
 #endif
 
+static inline int cirbuf_usedspace(const cirbuf_t *cb);
+
 static void create_buffer_mirror(cirbuf_t *cb)
 {
     char path[] = "/tmp/cirbuf-XXXXXX";
@@ -85,6 +87,8 @@ static inline int cirbuf_offer(cirbuf_t *cb,
     memcpy(cb->data + cb->tail, data, written);
     cb->tail += written;
     /* TODO: add your code here */
+    if (cb->size < cb->tail) 
+        cb->tail %= cb->size;
     return written;
 }
 
@@ -108,7 +112,7 @@ static inline unsigned char *cirbuf_peek(const cirbuf_t *cb)
         return NULL;
 
     /* TODO: add your own code here */
-    return NULL;
+    return cb->data + cb->head;
 }
 
 /** Release data at the head from the circular buffer.
@@ -127,7 +131,7 @@ static inline unsigned char *cirbuf_peek(const cirbuf_t *cb)
  */
 static inline unsigned char *cirbuf_poll(cirbuf_t *cb, const unsigned int size)
 {
-    if (cirbuf_is_empty(cb))
+    if (size > (unsigned int) cirbuf_usedspace(cb))
         return NULL;
 
     void *end = cb->data + cb->head;
