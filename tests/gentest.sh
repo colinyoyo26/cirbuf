@@ -7,6 +7,8 @@ echo \
 '
 /* This is auto-generated code. */
 #include <stdio.h>
+#include <signal.h>
+#include <setjmp.h>
 #include "unit-test.h"
 
 '
@@ -36,7 +38,10 @@ echo \
     printf("%s\n", CuStringC(output));
 }
 
+extern void segvhandler();
+
 int main() {
+    signal(SIGSEGV, segvhandler);
     RunAllTests();
     return 0;
 }
