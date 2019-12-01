@@ -18,28 +18,36 @@ typedef struct {
 #endif
 
 static inline int cirbuf_usedspace(const cirbuf_t *cb);
+static inline void cirbuf_free(cirbuf_t *cb);
 
 static void create_buffer_mirror(cirbuf_t *cb)
 {
     char path[] = "/tmp/cirbuf-XXXXXX";
     int fd = mkstemp(path);
-    unlink(path);
-    ftruncate(fd, cb->size);
-    /* FIXME: validate if mkstemp, unlink, ftruncate failed */
+    if (fd == -1 || unlink(path) == -1 || ftruncate(fd, cb->size) == -1)
+        goto out;
 
     /* create the array of data */
     cb->data = mmap(NULL, cb->size << 1, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE,
                     -1, 0);
-    /* FIXME: validate if cb->data != MAP_FAILED */
+    if (cb->data == MAP_FAILED) {
+        cirbuf_free(cb);
+        goto out;
+    }
 
     void *address = mmap(cb->data, cb->size, PROT_READ | PROT_WRITE,
                          MAP_FIXED | MAP_SHARED, fd, 0);
-    /* FIXME: validate if address == cb->data */
+    if (address != cb->data) {
+        cirbuf_free(cb);
+        goto out;
+    }
 
     address = mmap(cb->data + cb->size, cb->size, PROT_READ | PROT_WRITE,
                    MAP_FIXED | MAP_SHARED, fd, 0);
-    /* FIXME: validate if address == cb->data + cb->size */
+    if (address != cb->data + cb->size)
+        cirbuf_free(cb);
 
+out:
     close(fd);
 }
 
@@ -71,7 +79,8 @@ static inline int cirbuf_unusedspace(const cirbuf_t *cb);
  *
  * @param cb The circular buffer.
  * @param data Buffer to be written to the circular buffer.
- * @param size Size of the buffer to be added to the circular buffer in bytes.
+ * @param size Size of the buffer to be added to the circular buffer in
+ * bytes.
  * @return number of bytes offered
  */
 static inline int cirbuf_offer(cirbuf_t *cb,
@@ -87,7 +96,7 @@ static inline int cirbuf_offer(cirbuf_t *cb,
     memcpy(cb->data + cb->tail, data, written);
     cb->tail += written;
     /* TODO: add your code here */
-    if (cb->size < cb->tail) 
+    if (cb->size < cb->tail)
         cb->tail %= cb->size;
     return written;
 }
@@ -122,7 +131,8 @@ static inline unsigned char *cirbuf_peek(const cirbuf_t *cb)
  *  1. You are using the returned data pointer.
  *  2. Another thread has offerred data to the circular buffer.
  *
- * If you want to access the data from the returned pointer, you are better off
+ * If you want to access the data from the returned pointer, you are better
+ * off
  * using cirbuf_peek.
  *
  * @param cb The circular buffer.
@@ -151,7 +161,6 @@ static inline int cirbuf_size(const cirbuf_t *cb)
 {
     return cb->size;
 }
-
 /** Tell how much data has been written in bytes to the circular buffer.
  * @param cb The circular buffer.
  * @return number of bytes of how data has been written
