@@ -91,14 +91,12 @@ static inline int cirbuf_offer(cirbuf_t *cb,
     if (cirbuf_unusedspace(cb) <= size)
         return 0;
 
-    int written = cirbuf_unusedspace(cb);
-    written = size < written ? size : written;
-    memcpy(cb->data + cb->tail, data, written);
-    cb->tail += written;
-    /* TODO: add your code here */
+    memcpy(cb->data + cb->tail, data, size);
+    cb->tail += size;
+
     if (cb->size < cb->tail)
         cb->tail %= cb->size;
-    return written;
+    return size;
 }
 
 /** Tell if the circular buffer is empty.
