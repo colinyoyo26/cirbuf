@@ -15,4 +15,4 @@ plot: bench
 
 
 clean:
-	rm -f main.c driver
+	$(RM) main.c driver bench *.png
