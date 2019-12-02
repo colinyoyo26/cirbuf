@@ -24,29 +24,29 @@ static void create_buffer_mirror(cirbuf_t *cb)
     char path[] = "/tmp/cirbuf-XXXXXX";
     int fd = mkstemp(path);
     if (fd == -1 || unlink(path) == -1 || ftruncate(fd, cb->size) == -1)
-        goto out;
+        goto fail;
 
     /* create the array of data */
     cb->data = mmap(NULL, cb->size << 1, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE,
                     -1, 0);
-    if (cb->data == MAP_FAILED) {
-        munmap(cb->data, cb->size << 1);
-        goto out;
-    }
+    if (cb->data == MAP_FAILED)
+        goto fail;
 
     void *address = mmap(cb->data, cb->size, PROT_READ | PROT_WRITE,
                          MAP_FIXED | MAP_SHARED, fd, 0);
-    if (address != cb->data) {
-        munmap(cb->data, cb->size << 1);
-        goto out;
-    }
+    if (address != cb->data)
+        goto fail;
 
     address = mmap(cb->data + cb->size, cb->size, PROT_READ | PROT_WRITE,
                    MAP_FIXED | MAP_SHARED, fd, 0);
     if (address != cb->data + cb->size)
-        munmap(cb->data, cb->size << 1);
+        goto fail;
 
-out:
+    close(fd);
+    return;
+fail:
+    munmap(cb->data, cb->size << 1);
+    cb->data = NULL;
     close(fd);
 }
 
