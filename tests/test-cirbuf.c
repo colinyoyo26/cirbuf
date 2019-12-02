@@ -130,3 +130,9 @@ void TestCirbuf_can_offer_if_at_boundary(CuTest *tc){
     cirbuf_offer(&cb, "9876", 4);
     CuAssertTrue(tc, !strncmp("9876", (char *) cirbuf_poll(&cb, 4), 4));
 }
+
+void TestCirbuf_cant_init_if_not_multiple_of_pagesize(CuTest *tc)
+{
+    cirbuf_t cb;
+    CuAssertTrue(tc, !cirbuf_new(&cb, 65535));
+}
