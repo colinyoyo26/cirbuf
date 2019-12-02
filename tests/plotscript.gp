@@ -1,6 +1,6 @@
 set title "perf"
 set xlabel "iterations"
-set ylabel "time(ns)"
+set ylabel "time(ms)"
 set terminal png font " Times_New_Roman,12 "
 set key left
 set output "result.png"
