@@ -18,7 +18,6 @@ typedef struct {
 #endif
 
 static inline int cirbuf_usedspace(const cirbuf_t *cb);
-static inline void cirbuf_free(cirbuf_t *cb);
 
 static void create_buffer_mirror(cirbuf_t *cb)
 {
@@ -31,21 +30,21 @@ static void create_buffer_mirror(cirbuf_t *cb)
     cb->data = mmap(NULL, cb->size << 1, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE,
                     -1, 0);
     if (cb->data == MAP_FAILED) {
-        cirbuf_free(cb);
+        munmap(cb->data, cb->size << 1);
         goto out;
     }
 
     void *address = mmap(cb->data, cb->size, PROT_READ | PROT_WRITE,
                          MAP_FIXED | MAP_SHARED, fd, 0);
     if (address != cb->data) {
-        cirbuf_free(cb);
+        munmap(cb->data, cb->size << 1);
         goto out;
     }
 
     address = mmap(cb->data + cb->size, cb->size, PROT_READ | PROT_WRITE,
                    MAP_FIXED | MAP_SHARED, fd, 0);
     if (address != cb->data + cb->size)
-        cirbuf_free(cb);
+        munmap(cb->data, cb->size << 1);
 
 out:
     close(fd);
