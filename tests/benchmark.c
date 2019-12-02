@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include "cirbuf.h"
 
-#define BUFFER_SIZE 1024
-#define MESSAGE_SIZE 32
+#define BUFFER_SIZE 4096
+#define MESSAGE_SIZE 256
 
 static inline double microtime() {
     struct timespec tv;
