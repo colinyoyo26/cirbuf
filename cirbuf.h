@@ -54,11 +54,12 @@ fail:
  * @param size Size of the circular buffer.
  * @return pointer to new circular buffer
  */
-static inline void cirbuf_new(cirbuf_t *dst, const unsigned long int size)
+static inline bool cirbuf_new(cirbuf_t *dst, const unsigned long int size)
 {
     dst->size = size;
     dst->head = dst->tail = 0;
     create_buffer_mirror(dst);
+    return dst->data != NULL;
 }
 
 /** Free memory used by circular buffer
