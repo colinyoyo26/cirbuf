@@ -95,7 +95,7 @@ static inline int cirbuf_offer(cirbuf_t *cb,
     cb->tail += size;
 
     if (cb->size < cb->tail)
-        cb->tail %= cb->size;
+        cb->tail -= cb->size;
     return size;
 }
 
