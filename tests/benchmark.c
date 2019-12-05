@@ -8,7 +8,7 @@
 #define BUFFER_SIZE 4096
 #define MESSAGE_SIZE 256
 
-static inline double microtime() {
+static inline long microtime() {
     struct timespec tv;
     clock_gettime(CLOCK_MONOTONIC_RAW, &tv);
     return tv.tv_nsec * 1e-3;
