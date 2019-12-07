@@ -219,7 +219,7 @@ void CuSuiteAddSuite(CuSuite *testSuite, CuSuite *testSuite2)
     }
 }
 
-CuTest *testing;
+static CuTest *testing;
 void CuSuiteRun(CuSuite *testSuite)
 {
     for (int i = 0; i < testSuite->count; ++i) {
