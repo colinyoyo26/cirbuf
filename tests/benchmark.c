@@ -8,10 +8,10 @@
 #define BUFFER_SIZE 4096
 #define MESSAGE_SIZE 256
 
-static inline long microtime() {
-    struct timespec tv;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &tv);
-    return tv.tv_nsec * 1e-3;
+static inline double microtime() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return 1e6 * tv.tv_sec + tv.tv_usec;
 }
 
 int main(int argc, char** argv) {
@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     size_t offset;
     size_t runs = atoi(argv[1]);
  
-    long slow_start = microtime();
+    double slow_start = microtime();
     offset = 0;
     for(size_t i = 0; i < runs; i++){
         long mask = (MESSAGE_SIZE - BUFFER_SIZE + offset) >> 63;
@@ -30,18 +30,18 @@ int main(int argc, char** argv) {
         memcpy(buffer, message + part1, part2);
         offset = (offset + MESSAGE_SIZE) % BUFFER_SIZE;
     }
-    long slow_stop = microtime();
+    double slow_stop = microtime();
  
     cirbuf_t cb;
     cirbuf_new(&cb, BUFFER_SIZE);
-    long fast_start = microtime();
+    double fast_start = microtime();
     for(size_t i = 0; i < runs; i++){
        cirbuf_offer(&cb, message, MESSAGE_SIZE);
        cirbuf_poll(&cb, MESSAGE_SIZE);
     }
-    long fast_stop = microtime();
+    double fast_stop = microtime();
  
-    printf("%ld %ld\n", (slow_stop - slow_start), (fast_stop - fast_start));
+    printf("%lf %lf\n", (slow_stop - slow_start), (fast_stop - fast_start));
  
     return 0;
 }
