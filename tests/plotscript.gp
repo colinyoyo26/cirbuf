@@ -7,4 +7,5 @@ set output "result.png"
 
 plot \
 "data.txt" using 1:2 with linespoints linewidth 2 title "cirbuf (orig)", \
-"data.txt" using 1:3 with linespoints linewidth 2 title "cirbuf (mmap)" \
+"data.txt" using 1:3 with linespoints linewidth 2 title "cirbuf (mmap)", \
+"data.txt" using 1:4 with linespoints linewidth 2 title "cirbuf (opt)" \
