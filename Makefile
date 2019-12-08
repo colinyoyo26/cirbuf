@@ -1,4 +1,4 @@
-CFLAGS = -I. -Itests -g -O2 -Wall -W
+CFLAGS = -I. -Itests -g -O2 -Wall -W -mavx
 
 all: driver
 
