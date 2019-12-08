@@ -4,6 +4,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include "cirbuf.h"
+#include "offer_imprv.h"
 
 #define BUFFER_SIZE 4096
 #define MESSAGE_SIZE 256
@@ -41,7 +42,18 @@ int main(int argc, char** argv) {
     }
     double fast_stop = microtime();
  
-    printf("%lf %lf\n", (slow_stop - slow_start), (fast_stop - fast_start));
+    cirbuf_t cb2;
+    cirbuf_new(&cb2, BUFFER_SIZE);
+    double opt_start = microtime();
+    for(size_t i = 0; i < runs; i++){
+       cirbuf_offer_opt(&cb2, message, MESSAGE_SIZE);
+       cirbuf_poll(&cb2, MESSAGE_SIZE);
+    }
+    double opt_stop = microtime();
+ 
+    printf("%lf %lf %lf\n", (slow_stop - slow_start),
+                            (fast_stop - fast_start),
+                            (opt_stop - opt_start));
  
     return 0;
 }
