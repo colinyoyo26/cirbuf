@@ -1,5 +1,5 @@
 set title "perf"
-set xlabel "iterations"
+set xlabel "bytes"
 set ylabel "time(ms)"
 set terminal png font " Times_New_Roman,12 "
 set key left
