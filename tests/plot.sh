@@ -1,5 +1,5 @@
 
-for i in `seq 10 2000 100000`
+for i in `seq 32 60 10000`
 do
     printf "$i "
     ./bench $i 

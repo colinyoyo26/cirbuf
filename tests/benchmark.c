@@ -6,8 +6,11 @@
 #include "cirbuf.h"
 #include "offer_imprv.h"
 
-#define BUFFER_SIZE 4096
-#define MESSAGE_SIZE 256
+#define BUFFER_SIZE 65536
+#define MESSAGE_SIZE message_size
+#define RUNS 1000
+
+size_t message_size;
 
 static inline double microtime() {
     struct timeval tv;
@@ -19,11 +22,11 @@ int main(int argc, char** argv) {
     uint8_t message[MESSAGE_SIZE];
     uint8_t buffer[BUFFER_SIZE];
     size_t offset;
-    size_t runs = atoi(argv[1]);
+    message_size = atoi(argv[1]);
  
     double slow_start = microtime();
     offset = 0;
-    for(size_t i = 0; i < runs; i++){
+    for(size_t i = 0; i < RUNS; i++){
         long mask = (MESSAGE_SIZE - BUFFER_SIZE + offset) >> 63;
         const size_t part1 = MESSAGE_SIZE & mask + (BUFFER_SIZE - offset) & ~mask;
         const size_t part2 = MESSAGE_SIZE - part1;
@@ -36,7 +39,7 @@ int main(int argc, char** argv) {
     cirbuf_t cb;
     cirbuf_new(&cb, BUFFER_SIZE);
     double fast_start = microtime();
-    for(size_t i = 0; i < runs; i++){
+    for(size_t i = 0; i < RUNS; i++){
        cirbuf_offer(&cb, message, MESSAGE_SIZE);
        cirbuf_poll(&cb, MESSAGE_SIZE);
     }
@@ -45,7 +48,7 @@ int main(int argc, char** argv) {
     cirbuf_t cb2;
     cirbuf_new(&cb2, BUFFER_SIZE);
     double opt_start = microtime();
-    for(size_t i = 0; i < runs; i++){
+    for(size_t i = 0; i < RUNS; i++){
        cirbuf_offer_opt(&cb2, message, MESSAGE_SIZE);
        cirbuf_poll(&cb2, MESSAGE_SIZE);
     }
