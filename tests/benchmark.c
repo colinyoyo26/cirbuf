@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "cirbuf.h"
 #include "offer_imprv.h"
+#include "offer_orig.h"
 
 #define BUFFER_SIZE 65536
 #define MESSAGE_SIZE message_size
@@ -19,23 +20,18 @@ static inline double microtime() {
 }
 
 int main(int argc, char** argv) {
-    uint8_t message[MESSAGE_SIZE];
-    uint8_t buffer[BUFFER_SIZE];
-    size_t offset;
     message_size = atoi(argv[1]);
+    uint8_t message[MESSAGE_SIZE];
  
+    cirbuf_t orig;
+    cirbuf_new(&orig, BUFFER_SIZE);
     double slow_start = microtime();
-    offset = 0;
     for(size_t i = 0; i < RUNS; i++){
-        long mask = (MESSAGE_SIZE - BUFFER_SIZE + offset) >> 63;
-        const size_t part1 = MESSAGE_SIZE & mask + (BUFFER_SIZE - offset) & ~mask;
-        const size_t part2 = MESSAGE_SIZE - part1;
-        memcpy(buffer + offset, message, part1);
-        memcpy(buffer, message + part1, part2);
-        offset = (offset + MESSAGE_SIZE) % BUFFER_SIZE;
+        cirbuf_offer_orig(&orig, message, MESSAGE_SIZE);
+        cirbuf_poll(&orig, MESSAGE_SIZE);
     }
     double slow_stop = microtime();
- 
+    
     cirbuf_t cb;
     cirbuf_new(&cb, BUFFER_SIZE);
     double fast_start = microtime();
