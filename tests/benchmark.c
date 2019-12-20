@@ -14,9 +14,9 @@
 size_t message_size;
 
 static inline double microtime() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return 1e6 * tv.tv_sec + tv.tv_usec;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    return ts.tv_sec * 1e6 + ts.tv_nsec * 1e-3;
 }
 
 int main(int argc, char** argv) {
